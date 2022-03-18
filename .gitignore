@@ -55,10 +55,10 @@ ngclient/*.sublime-workspace
 
 # Visual Studio Code
 ngclient/.vscode/*
-ngclient/!.vscode/settings.json
-ngclient/!.vscode/tasks.json
-ngclient/!.vscode/launch.json
-ngclient/!.vscode/extensions.json
+!ngclient/.vscode/settings.json
+!ngclient/.vscode/tasks.json
+!ngclient/.vscode/launch.json
+!ngclient/.vscode/extensions.json
 ngclient/.history/*
 
 # Miscellaneous
