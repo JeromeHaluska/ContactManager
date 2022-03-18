@@ -1,0 +1,76 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Angular Client ###
+# Compiled output
+ngclient/dist
+ngclient/tmp
+ngclient/out-tsc
+ngclient/bazel-out
+
+# Node
+ngclient/node_modules
+ngclient/npm-debug.log
+ngclient/yarn-error.log
+
+# IDEs and editors
+ngclient/.idea/
+ngclient/.project
+ngclient/.classpath
+ngclient/.c9/
+ngclient/*.launch
+ngclient/.settings/
+ngclient/*.sublime-workspace
+
+# Visual Studio Code
+ngclient/.vscode/*
+ngclient/!.vscode/settings.json
+ngclient/!.vscode/tasks.json
+ngclient/!.vscode/launch.json
+ngclient/!.vscode/extensions.json
+ngclient/.history/*
+
+# Miscellaneous
+ngclient/.angular/cache
+ngclient/.sass-cache/
+ngclient/connect.lock
+ngclient/coverage
+ngclient/libpeerconnection.log
+ngclient/testem.log
+ngclient/typings
+
+# System files
+ngclient/.DS_Store
+ngclient/Thumbs.db
+
