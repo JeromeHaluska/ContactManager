@@ -1,1 +1,30 @@
-<p>contact-details works!</p>
+<div class="card my-5">
+    <div class="card-body">
+        <!-- Error alert -->
+        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+            {{ errorMessage }}
+        </div>
+
+        <!-- Loading alert -->
+        <div *ngIf="!errorMessage && !contact" class="alert alert-info" role="alert">
+            Loading contact...
+        </div>
+
+        <!-- Present all contact information and actions -->
+        <div *ngIf="contact">
+            <h3>Contact #{{ contact.id }}</h3>
+            <ul>
+                <li>Name: {{ contact.firstName }} {{ contact.lastName }}</li>
+                <li>E-Mail: <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></li>
+            </ul>
+            <!-- Edit or delete contact -->
+            <div class="btn-group float-start" role="group" aria-label="Contact actions">
+                <a routerLink="/contacts/{{ contact.id }}" class="btn btn-dark">Edit</a>
+                <a (click)="deleteContact(contact)" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+
+        <!-- Route back to contact list -->
+        <a routerLink="/all" class="btn btn-secondary float-end">Back</a>
+    </div>
+  </div>

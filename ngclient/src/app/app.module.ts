@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { ContactDetailsComponent } from './contact-details/contact-details.component';
 import { ContactListComponent } from './contact-list/contact-list.component';
 import { ContactService } from './contact.service';
+import { ContactAddComponent } from './contact-add/contact-add.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ContactDetailsComponent,
-    ContactListComponent
+    ContactListComponent,
+    ContactAddComponent
   ],
   imports: [
     BrowserModule,
@@ -20,7 +22,8 @@ import { ContactService } from './contact.service';
     RouterModule.forRoot(
       [
         { path: "all", component: ContactListComponent},
-        { path: "contact/:contactId", component: ContactDetailsComponent}
+        { path: "add", component: ContactAddComponent},
+        { path: "contacts/:id", component: ContactDetailsComponent}
       ]
     )
   ],

@@ -6,6 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-
   title = 'Contact Manager';
+
+  resetDb(): void {
+    alert('Todo: Empty database and repopulate');
+  }
 }
