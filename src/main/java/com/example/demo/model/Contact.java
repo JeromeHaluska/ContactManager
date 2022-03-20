@@ -40,11 +40,23 @@ public class Contact {
         return firstName;
     }
 
+    public void setFirstName(String newfirstName) {
+        firstName = newfirstName;
+    }
+
     public String getLastName() {
         return lastName;
     }
 
+    public void setLastName(String newLastName) {
+        lastName = newLastName;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String newEmail) {
+        email = newEmail;
     }
 }
