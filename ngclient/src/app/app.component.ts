@@ -33,10 +33,8 @@ export class AppComponent {
     while (contacts.length < targetLength) {
       let firstName = firstNames[this.randomRange(0, firstNames.length - 1)];
       let lastName = lastNames[this.randomRange(0, lastNames.length - 1)];
-      contacts.push(new Contact(
-        firstName, lastName,
-        (firstName + '.' + lastName).toLowerCase() + '@' + mailProvider[this.randomRange(0, mailProvider.length - 1)]
-      ));
+      let email = (firstName + '.' + lastName).toLowerCase() + '@' + mailProvider[this.randomRange(0, mailProvider.length - 1)];
+      contacts.push(new Contact(firstName, lastName, email, ''));
     }
 
     // Replace database entries and redirect to list component

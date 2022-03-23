@@ -40,10 +40,12 @@ public class ContactController {
     @PutMapping("/contacts/{id}")
     Contact updateContact(@RequestBody Contact newContact, @PathVariable Long id) {
         logger.info("Update requested for contact record #" + id, newContact);
+        logger.info(newContact.toString());
         return repository.findById(id).map(contact -> {
             contact.setFirstName(newContact.getFirstName());
             contact.setLastName(newContact.getLastName());
             contact.setEmail(newContact.getEmail());
+            contact.setDescription(newContact.getDescription());
             return repository.save(contact);
         }).orElseGet(() -> {
             return repository.save(newContact);
@@ -53,12 +55,17 @@ public class ContactController {
     @PostMapping("/contacts/add")
     void addContact(@RequestBody Contact contact) {
         Contact newContact = repository.save(contact);
-        logger.info("Created contact record #" + newContact.getId(), newContact);
+        logger.info("Created contact record #" + newContact.getId());
+        logger.info(newContact.toString());
     }
 
     @DeleteMapping("/contacts/{id}")
     void deleteContact(@PathVariable Long id) {
         logger.info("Deletion requested for contact record #" + id);
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+        } catch (IllegalArgumentException e) {
+            throw new ContactNotFoundException(id);
+        }
     }
 }

@@ -5,4 +5,4 @@ A Spring Boot / Angular demo application.
 Run `mvn spring-boot:run` to start the spring boot application with integrated database.
 
 ## Start Frontend Server (use inside /ngclient folder)
-Run `ng serve -o` to start the angular frontend
+Run `ng serve -o` to start the angular frontend.

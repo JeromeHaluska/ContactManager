@@ -33,10 +33,10 @@ export class ContactDetailsComponent implements OnInit {
     this.contactService.findById(Number(this.route.snapshot.paramMap.get('id'))).subscribe({
       next: contact => {
         this.contact = contact;
+        console.log('contact-details', contact)
       },
       error: error => {
         this.errorMessage = error.message;
-        console.error('An error occurred while fetching contact list!', error);
       }
     });
   }
