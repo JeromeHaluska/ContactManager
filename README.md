@@ -1,8 +1,8 @@
 # ContactManager
-A Spring Boot / Angular demo application
+A Spring Boot / Angular demo application.
 
-Backend run command:
-mvn spring-boot:run
+## Start Backend Server
+Run `mvn spring-boot:run` to start the spring boot application with integrated database.
 
-Frontend run command: (use inside /ngclient folder)
-ng serve -o
+## Start Frontend Server (use inside /ngclient folder)
+Run `ng serve -o` to start the angular frontend
