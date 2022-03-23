@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Contact } from '../contact';
 
 import { ContactService } from '../contact.service';
@@ -9,8 +9,7 @@ import { ContactService } from '../contact.service';
   styleUrls: ['./contact-list.component.css']
 })
 export class ContactListComponent implements OnInit {
-  errorMessage: string = '';
-  searchQuery: string = '';
+  errorMessage = '';
   contacts: Contact[] = [];
   filteredContacts: Contact[] = [];
 
@@ -26,5 +25,18 @@ export class ContactListComponent implements OnInit {
         this.errorMessage = error.message;
       }
     });
+  }
+
+  updateSearch($event: Event): void {
+    let search: string = ($event.target as HTMLInputElement).value;
+    this.filteredContacts = [];
+    this.contacts.forEach(contact => {
+      if (contact.firstName.toLocaleLowerCase().includes(search) ||
+          contact.lastName.toLocaleLowerCase().includes(search) ||
+          contact.id.toString().includes(search)) {
+        this.filteredContacts.push(contact);
+      }
+    });
+    console.log('Search complete found ' + this.filteredContacts.length + ' matching contacts')
   }
 }

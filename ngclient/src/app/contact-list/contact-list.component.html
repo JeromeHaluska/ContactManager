@@ -3,13 +3,22 @@
     {{ errorMessage }}
 </div>
 <div *ngIf="!errorMessage && !contacts.length" class="alert alert-info mb-1" role="alert">
-    Loading contact list...
+  <div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading contact list...
 </div>
 
 <!-- Data table -->
 <div class="card" *ngIf="contacts.length">
-  <div class="card-header"><strong>All Contacts</strong></div>
-  <div class="card-body">
+  <h5 class="card-header">
+      <div class="row">
+        <div class="col">
+          All Contacts
+        </div>
+        <div class="col">
+          <input (change)="updateSearch($event)" name="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
+        </div>
+      </div>
+  </h5>
+  <div class="card-body overflow-auto">
     <table class="table table-bordered table-striped">
       <thead class="thead-dark">
         <tr>
