@@ -1,21 +1,18 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
+  <div class="container">
     <a class="navbar-brand">Contact Manager</a>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" (click)="redirectTo('/all')" href="javascript:void(0)">List Contacts</a>
+          <a (click)="redirectTo('/all')" class="nav-link" href="javascript:void(0)">List Contacts</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/add">New Contact</a>
+          <a (click)="redirectTo('/add')" class="nav-link" href="javascript:void(0)">New Contact</a>
         </li>
       </ul>
-      <div class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <!-- Reset database records -->
-        <button class="btn btn-outline-danger" (click)="resetDb()">Reset</button>
-      </div>
+      <!-- Reset database records -->
+      <button class="btn btn-outline-danger" (click)="resetDb()">Reset</button>
     </div>
   </div>
 </nav>
@@ -24,11 +21,11 @@
   <div class="container">
     <div class="row">
       <div class="col-md-3">
-        <div class="list-group">
-          <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center active">All Contacts <span class="badge">14</span></a>
-          <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">Recent <span class="badge">4</span></a>
-          <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">Favorites <span class="badge">3</span></a>
-          <a href="javascript:void(0)" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">Other <span class="badge">3</span></a>
+        <div class="list-group mb-3">
+          <a (click)="redirectTo('/all')" href="javascript:void(0)" class="list-group-item d-flex justify-content-between active">All Contacts <span class="badge bg-secondary">{{ numberOfContacts }}</span></a>
+          <a href="javascript:void(0)" class="list-group-item disabled">Recent</a>
+          <a href="javascript:void(0)" class="list-group-item disabled">Favorites</a>
+          <a href="javascript:void(0)" class="list-group-item disabled">Other</a>
         </div>
       </div>
       <div class="col-md-9">

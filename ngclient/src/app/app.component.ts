@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { forkJoin, Observable, take } from 'rxjs';
+import { take } from 'rxjs';
 import { Contact } from './contact';
 import { ContactService } from './contact.service';
 
@@ -11,8 +11,11 @@ import { ContactService } from './contact.service';
 })
 export class AppComponent {
   title = 'Contact Manager';
+  numberOfContacts = 0;
 
-  constructor(private contactService: ContactService, private router: Router) { }
+  constructor(private contactService: ContactService, private router: Router) {
+    this.contactService.findAll().subscribe(contacts => { this.numberOfContacts = contacts.length });
+  }
 
   private randomRange(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min);
