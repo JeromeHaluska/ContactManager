@@ -27,16 +27,17 @@ export class ContactListComponent implements OnInit {
     });
   }
 
+
   updateSearch($event: Event): void {
-    let search: string = ($event.target as HTMLInputElement).value;
+    let search: string = ($event.target as HTMLInputElement).value.toLowerCase();
     this.filteredContacts = [];
     this.contacts.forEach(contact => {
       if (contact.firstName.toLocaleLowerCase().includes(search) ||
           contact.lastName.toLocaleLowerCase().includes(search) ||
+          contact.email.toLocaleLowerCase().includes(search) ||
           contact.id.toString().includes(search)) {
         this.filteredContacts.push(contact);
       }
     });
-    console.log('Search complete found ' + this.filteredContacts.length + ' matching contacts')
   }
 }

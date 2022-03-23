@@ -22,19 +22,20 @@ export class AppComponent {
   }
 
   resetDb(): void {
-    let targetLength = 10;
+    let targetLength = 12;
     let contacts: Contact[] = [];
     let firstNames: string[] = ['Jack', 'Chloe', 'Kim', 'David', 'Michelle', 'Liam', 'Emma'];
     let lastNames: string[] = ['Bauer', 'O\'Brian', 'Jones', 'David', 'Davis', 'Williams', 'Miller'];
     let mailProvider: string[] = ['company.com', 'gmx.com', 'web.de', 'example.com', 'gmail.com'];
-    //let phoneNumbers: String[] = ['9999 9999', '+61 2 9999 9999', '(02) 9999 9999'];
+    let phoneNumbers: string[] = ['9999 9999', '+61 2 9999 9999', '(02) 9999 9999'];
 
     // Create list of randomized contacts
     while (contacts.length < targetLength) {
       let firstName = firstNames[this.randomRange(0, firstNames.length - 1)];
       let lastName = lastNames[this.randomRange(0, lastNames.length - 1)];
       let email = (firstName + '.' + lastName).toLowerCase() + '@' + mailProvider[this.randomRange(0, mailProvider.length - 1)];
-      contacts.push(new Contact(firstName, lastName, email, ''));
+      let phone = phoneNumbers[this.randomRange(0, phoneNumbers.length - 1)];
+      contacts.push(new Contact(firstName, lastName, email, phone));
     }
 
     // Replace database entries and redirect to list component

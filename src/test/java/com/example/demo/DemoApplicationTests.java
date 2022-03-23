@@ -35,11 +35,11 @@ class DemoApplicationTests {
 
 		// Save a few contacts
 		Contact[] contacts = {
-			new Contact("Jack", "Bauer", "jack.bauer@gmail.com"),
-			new Contact("Chloe", "O'Brian", "chloe.obrian@example.com"),
-			new Contact("Kim", "Bauer", "kim.bauer@web.de"),
-			new Contact("David", "Palmer", "david.palmer@gmx.com"),
-			new Contact("Michelle", "Dessler", "michelle.dessler@company.com"),
+			new Contact("Jack", "Bauer", "jack.bauer@gmail.com", "9999 9999", ""),
+			new Contact("Chloe", "O'Brian", "chloe.obrian@example.com", "+61 2 9999 9999", ""),
+			new Contact("Kim", "Bauer", "kim.bauer@web.de", "(02) 9999 9999", ""),
+			new Contact("David", "Palmer", "david.palmer@gmx.com", "9999 9999", ""),
+			new Contact("Michelle", "Dessler", "michelle.dessler@company.com", "+61 2 9999 9999", ""),
 		};
 		for (Contact contact : contacts) {
 			repository.save(contact);

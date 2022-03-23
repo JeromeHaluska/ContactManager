@@ -45,6 +45,7 @@ public class ContactController {
             contact.setFirstName(newContact.getFirstName());
             contact.setLastName(newContact.getLastName());
             contact.setEmail(newContact.getEmail());
+            contact.setPhone(newContact.getPhone());
             contact.setDescription(newContact.getDescription());
             return repository.save(contact);
         }).orElseGet(() -> {

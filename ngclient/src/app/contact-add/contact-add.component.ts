@@ -14,7 +14,7 @@ export class ContactAddComponent implements OnInit {
   isLoading = false;
   isPrefill = false;
   errorMessage = '';
-  contact: Contact = new Contact('', '', '', '');
+  contact: Contact = new Contact();
 
   constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
 
@@ -36,15 +36,15 @@ export class ContactAddComponent implements OnInit {
     this.isLoading = true;
     if (this.isPrefill) {
       // Update existing record
-      console.log('contact-add', this.contact, f.value);
       this.contact.firstName = f.value.firstName;
       this.contact.lastName = f.value.lastName;
       this.contact.email = f.value.email;
+      this.contact.phone = f.value.phone;
       this.contact.description = f.value.description;
       stream$ = this.contactService.update(this.contact);
     } else {
       // Create new record
-      let newContact = new Contact(f.value.firstName, f.value.lastName, f.value.email, f.value.description);
+      let newContact = new Contact(f.value.firstName, f.value.lastName, f.value.email, f.value.phone, f.value.description);
       stream$ = this.contactService.add(newContact);
     }
     stream$.subscribe({
