@@ -4,6 +4,8 @@ import com.example.demo.ContactNotFoundException;
 import com.example.demo.model.Contact;
 import com.example.demo.repository.ContactRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:4200")
 public class ContactController {
     private final ContactRepository repository;
+    private Logger logger = LoggerFactory.getLogger(ContactController.class);
 
     public ContactController(ContactRepository contactRepository) {
         this.repository = contactRepository;
@@ -24,13 +27,13 @@ public class ContactController {
 
     @GetMapping("/contacts/all")
 	public Iterable<Contact> getContacts() {
-        System.out.println("Listing of all contacts requested");
+        logger.info("Listing of all contact records requested");
 		return repository.findAll();
 	}
 
     @GetMapping("/contacts/{id}")
     Contact getById(@PathVariable Long id) {
-        System.out.println("Listing requested for contact ressource #" + id);
+        logger.info("Listing requested for contact record #" + id);
         return repository.findById(id).orElseThrow(() -> new ContactNotFoundException(id));
     }
 
@@ -48,12 +51,13 @@ public class ContactController {
 
     @PostMapping("/contacts/add")
     void addContact(@RequestBody Contact contact) {
-        repository.save(contact);
+        Contact newContact = repository.save(contact);
+        logger.info("Created contact record #" + newContact.getId(), newContact);
     }
 
     @DeleteMapping("/contacts/{id}")
     void deleteContact(@PathVariable Long id) {
-        System.out.println("Deletion requested for contact resource #" + id);
+        logger.info("Deletion requested for contact record #" + id);
         repository.deleteById(id);
     }
 }
