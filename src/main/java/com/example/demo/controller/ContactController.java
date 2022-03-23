@@ -33,12 +33,13 @@ public class ContactController {
 
     @GetMapping("/contacts/{id}")
     Contact getById(@PathVariable Long id) {
-        logger.info("Listing requested for contact record #" + id);
+        logger.info("Info requested for contact record #" + id);
         return repository.findById(id).orElseThrow(() -> new ContactNotFoundException(id));
     }
 
     @PutMapping("/contacts/{id}")
     Contact updateContact(@RequestBody Contact newContact, @PathVariable Long id) {
+        logger.info("Update requested for contact record #" + id, newContact);
         return repository.findById(id).map(contact -> {
             contact.setFirstName(newContact.getFirstName());
             contact.setLastName(newContact.getLastName());
