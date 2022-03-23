@@ -37,7 +37,15 @@ export class ContactService {
   }
 
   public update(contact: Contact): Observable<Contact> {
-    return this.http.put<Contact>(this.apiUrl + contact.id, contact);
+    let updateAndFetch$ = new Observable<Contact>(subscriber => {
+      this.http.put<Contact>(this.apiUrl + contact.id, contact).subscribe(data => {
+        this.fetchAll().subscribe(() => {
+          subscriber.next(data);
+          subscriber.complete();
+        });
+      })
+    });
+    return updateAndFetch$;
   }
 
   public add(contact: Contact): Observable<Contact> {
