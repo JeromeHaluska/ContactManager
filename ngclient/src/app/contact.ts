@@ -1,11 +1,10 @@
 export class Contact {
-    id: number;
+    id: number = -1;
     firstName: string;
     lastName: string;
     email: string;
 
-    constructor(id: number, firstName: string, lastName: string, email: string) {
-        this.id = id;
+    constructor(firstName: string, lastName: string, email: string) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

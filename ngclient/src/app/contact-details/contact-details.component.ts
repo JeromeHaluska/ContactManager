@@ -9,24 +9,21 @@ import { ContactService } from '../contact.service';
   styleUrls: ['./contact-details.component.css']
 })
 export class ContactDetailsComponent implements OnInit {
-  errorMessage: String = '';
+  errorMessage: string = '';
   contact!: Contact;
-  editMode: Boolean = false;
+  editMode: boolean = false;
 
   constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
 
   deleteContact(contact: Contact) {
-    if (confirm('You\'re about to remove contact #' + contact.id + '. Are you sure?')) {
-      this.contactService.delete(contact);
-      this.router.navigate(['/all']);
+    if (confirm('You\'re about to remove contact #' + contact.id + ' permanently. Continue?')) {
+      this.contactService.delete(contact).subscribe(() => {
+        this.router.navigate(['/all']);
+      });
     }
   }
 
   ngOnInit(): void {
-    this.contactService.findById(Number(this.route.snapshot.paramMap.get('id'))).subscribe(contact => {
-      this.contact = contact;
-    });
-
     this.contactService.findById(Number(this.route.snapshot.paramMap.get('id'))).subscribe({
       next: contact => {
         this.contact = contact;

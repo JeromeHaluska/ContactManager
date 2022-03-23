@@ -1,16 +1,16 @@
-<div class="card my-5">
+<!-- Error and loading alert -->
+<div *ngIf="errorMessage" class="alert alert-danger mb-1" role="alert">
+    {{ errorMessage }}
+</div>
+<div *ngIf="!errorMessage && !contacts.length" class="alert alert-info mb-1" role="alert">
+    Loading contact list...
+</div>
+
+<!-- Data table -->
+<div class="card" *ngIf="contacts.length">
+  <div class="card-header"><strong>All Contacts</strong></div>
   <div class="card-body">
-    <!-- Error alert -->
-    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-        {{ errorMessage }}
-    </div>
-
-    <!-- Loading alert -->
-    <div *ngIf="!errorMessage && !contacts.length" class="alert alert-info" role="alert">
-        Loading contact list...
-    </div>
-
-    <table *ngIf="contacts.length" class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped">
       <thead class="thead-dark">
         <tr>
           <th scope="col">#</th>
@@ -21,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let contact of contacts">
+        <tr *ngFor="let contact of filteredContacts">
           <td>{{ contact.id }}</td>
           <td>{{ contact.firstName }}</td>
           <td>{{ contact.lastName }}</td>

@@ -9,22 +9,22 @@ import { ContactService } from '../contact.service';
   styleUrls: ['./contact-list.component.css']
 })
 export class ContactListComponent implements OnInit {
-  errorMessage: String = '';
+  errorMessage: string = '';
+  searchQuery: string = '';
   contacts: Contact[] = [];
+  filteredContacts: Contact[] = [];
 
-  constructor(private contactService: ContactService) {
-    contactService.findAll().subscribe({
+  constructor(private contactService: ContactService) { }
+
+  ngOnInit(): void {
+    this.contactService.findAll().subscribe({
       next: contacts => {
         this.contacts = contacts as Contact[];
+        this.filteredContacts = this.contacts;
       },
       error: error => {
         this.errorMessage = error.message;
-        console.error('An error occurred while fetching contact list!', error);
       }
     });
   }
-
-  ngOnInit(): void {
-  }
-
 }
