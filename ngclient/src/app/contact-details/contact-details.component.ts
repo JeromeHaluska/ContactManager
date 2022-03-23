@@ -15,6 +15,12 @@ export class ContactDetailsComponent implements OnInit {
 
   constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
 
+  editContact(contact: Contact) {
+    this.router.navigate(['/add'], {
+      queryParams: {'id': contact.id },
+    })
+  }
+
   deleteContact(contact: Contact) {
     if (confirm('You\'re about to remove contact #' + contact.id + ' permanently. Continue?')) {
       this.contactService.delete(contact).subscribe(() => {
