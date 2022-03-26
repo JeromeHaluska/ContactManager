@@ -25,7 +25,7 @@ public class ContactController {
         this.repository = contactRepository;
     }
 
-    @GetMapping("/contacts/all")
+    @GetMapping("/contacts")
 	public Iterable<Contact> getContacts() {
         logger.info("Listing of all contact records requested");
 		return repository.findAll();
@@ -53,7 +53,7 @@ public class ContactController {
         });
     }
 
-    @PostMapping("/contacts/add")
+    @PostMapping("/contacts")
     void addContact(@RequestBody Contact contact) {
         Contact newContact = repository.save(contact);
         logger.info("Created contact record #" + newContact.getId());

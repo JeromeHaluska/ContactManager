@@ -1,11 +1,20 @@
 package com.example.demo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class Contact {
@@ -13,13 +22,31 @@ public class Contact {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @NotBlank(message = "First name is mandatory")
     private String firstName;
+
+    @NotBlank(message = "Last name is mandatory")
     private String lastName;
+
+    @NotBlank(message = "Email is mandatory")
     private String email;
+
+    @NotBlank(message = "Phone number is mandatory")
     private String phone;
+
     @Lob
     @Column(name="description", length=512)
+    @NotNull(message = "Description may not be null")
     private String description;
+
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+        name = "Contact_Tag", 
+        joinColumns = { @JoinColumn(name = "contact_id") }, 
+        inverseJoinColumns = { @JoinColumn(name = "tag_id") }
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     protected Contact() {}
 
@@ -42,7 +69,6 @@ public class Contact {
         return id;
     }
 
-    //@NotBlank(message = "First name is mandatory")
     public String getFirstName() {
         return firstName;
     }
@@ -81,5 +107,17 @@ public class Contact {
 
     public void setDescription(String newDescription) {
         description = newDescription;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void addTag(Tag tag) {
+        this.tags.add(tag);
+    }
+
+    public void removeTag(Tag tag) {
+        this.tags.remove(tag);
     }
 }
