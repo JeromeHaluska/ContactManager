@@ -1,8 +1,8 @@
 <!-- Error and loading alert -->
-<div *ngIf="errorMessage" class="alert alert-danger mb-1" role="alert">
+<div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
   {{ errorMessage }}
 </div>
-<div *ngIf="!errorMessage && !contact" class="alert alert-info mb-1" role="alert">
+<div *ngIf="!errorMessage && !contact" class="alert alert-info mb-3" role="alert">
   <div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading contact...
 </div>
 
@@ -43,7 +43,7 @@
         <div class="row">
           <div class="col-md-offset-3 col-md-6">
             <!-- Edit or delete contact -->
-            <button (click)="editContact(contact)" class="btn btn-dark me-1" [disabled]="!contact">Edit</button>
+            <button (click)="editContact(contact)" class="btn btn-primary me-1" [disabled]="!contact">Edit</button>
             <button (click)="deleteContact(contact)" class="btn btn-danger me-1" [disabled]="!contact">Delete</button>
             <!-- Navigate back to contact list -->
             <a routerLink="/all" class="btn btn-outline-secondary">Back</a>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEvent, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Contact } from './contact';
-import { forkJoin, Observable, ReplaySubject } from 'rxjs';
+import { forkJoin, Observable, ReplaySubject, Subscriber } from 'rxjs';
 
 @Injectable()
 export class ContactService {
@@ -16,7 +16,7 @@ export class ContactService {
 
   // Request list of all contacts from api
   private fetchAll(): Observable<Contact[]> {
-    this.http.get<Contact[]>(this.apiUrl + 'all').subscribe({
+    this.http.get<Contact[]>(this.apiUrl).subscribe({
       next: contacts => {
         this.contactsSubject.next(contacts);
       },
@@ -26,6 +26,20 @@ export class ContactService {
       }
     });
     return this.findAll();
+  }
+
+  private fetchAndPassResponseThrough(subscriber: Subscriber<any>, stream$: Observable<any>) {
+    stream$.subscribe({
+      next: data => {
+        this.fetchAll().subscribe(() => {
+          subscriber.next(data);
+          subscriber.complete();
+        });
+      },
+      error: error => {
+        subscriber.error(error);
+      }
+    });
   }
 
   public findAll(): Observable<Contact[]> {
@@ -38,24 +52,20 @@ export class ContactService {
 
   public update(contact: Contact): Observable<Contact> {
     let updateAndFetch$ = new Observable<Contact>(subscriber => {
-      this.http.put<Contact>(this.apiUrl + contact.id, contact).subscribe(data => {
+      this.fetchAndPassResponseThrough(subscriber, this.http.put<Contact>(this.apiUrl + contact.id, contact));
+      /*this.http.put<Contact>(this.apiUrl + contact.id, contact).subscribe(data => {
         this.fetchAll().subscribe(() => {
           subscriber.next(data);
           subscriber.complete();
         });
-      })
+      });*/
     });
     return updateAndFetch$;
   }
 
   public add(contact: Contact): Observable<Contact> {
     let addAndFetch$ = new Observable<Contact>(subscriber => {
-      this.http.post<Contact>(this.apiUrl + 'add', contact).subscribe(data => {
-        this.fetchAll().subscribe(() => {
-          subscriber.next(data);
-          subscriber.complete();
-        });
-      })
+      this.fetchAndPassResponseThrough(subscriber, this.http.post<Contact>(this.apiUrl, contact));
     });
     return addAndFetch$;
   }
@@ -63,7 +73,7 @@ export class ContactService {
   public addList(contacts: Contact[]): Observable<Contact[]> {
     // Prepare deletion of multiple contacts
     let streams$: Observable<Contact>[] = [];
-    contacts.forEach((contact: Contact) => streams$.push(this.http.post<Contact>(this.apiUrl + 'add', contact)));
+    contacts.forEach((contact: Contact) => streams$.push(this.http.post<Contact>(this.apiUrl, contact)));
     // Create combined observer for deletion
     let addAndFetch$ = new Observable<Contact[]>(subscriber => {
       if (contacts.length === 0) {

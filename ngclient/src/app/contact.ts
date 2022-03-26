@@ -5,6 +5,7 @@ export class Contact {
     email: string;
     phone: string;
     description: string;
+    tags: string[] = [];
 
     constructor(firstName: string = '', lastName: string = '', email: string = '', phone: string = '', description: string = '') {
         this.firstName = firstName;

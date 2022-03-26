@@ -15,20 +15,6 @@ export class ContactDetailsComponent implements OnInit {
 
   constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
 
-  editContact(contact: Contact) {
-    this.router.navigate(['/add'], {
-      queryParams: {'id': contact.id },
-    })
-  }
-
-  deleteContact(contact: Contact) {
-    if (confirm('You\'re about to remove contact #' + contact.id + ' permanently. Continue?')) {
-      this.contactService.delete(contact).subscribe(() => {
-        this.router.navigate(['/all']);
-      });
-    }
-  }
-
   ngOnInit(): void {
     this.contactService.findById(Number(this.route.snapshot.paramMap.get('id'))).subscribe({
       next: contact => {
@@ -38,5 +24,17 @@ export class ContactDetailsComponent implements OnInit {
         this.errorMessage = error.message;
       }
     });
+  }
+
+  editContact(contact: Contact) {
+    this.router.navigate(['contacts/' + contact.id + '/edit']);
+  }
+
+  deleteContact(contact: Contact) {
+    if (confirm('You\'re about to remove contact #' + contact.id + ' permanently. Continue?')) {
+      this.contactService.delete(contact).subscribe(() => {
+        this.router.navigate(['/all']);
+      });
+    }
   }
 }

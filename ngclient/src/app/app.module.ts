@@ -25,6 +25,7 @@ import { ContactAddComponent } from './contact-add/contact-add.component';
       [
         { path: "all", component: ContactListComponent},
         { path: "add", component: ContactAddComponent},
+        { path: "contacts/:id/edit", component: ContactAddComponent},
         { path: "contacts/:id", component: ContactDetailsComponent}
       ], {
         onSameUrlNavigation: 'reload'

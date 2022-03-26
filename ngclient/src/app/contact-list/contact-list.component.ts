@@ -32,9 +32,10 @@ export class ContactListComponent implements OnInit {
     let search: string = ($event.target as HTMLInputElement).value.toLowerCase();
     this.filteredContacts = [];
     this.contacts.forEach(contact => {
-      if (contact.firstName.toLocaleLowerCase().includes(search) ||
-          contact.lastName.toLocaleLowerCase().includes(search) ||
+      let fullName = contact.firstName + ' ' + contact.lastName;
+      if (fullName.toLocaleLowerCase().includes(search) ||
           contact.email.toLocaleLowerCase().includes(search) ||
+          contact.phone.toLocaleLowerCase().includes(search) ||
           contact.id.toString().includes(search)) {
         this.filteredContacts.push(contact);
       }
