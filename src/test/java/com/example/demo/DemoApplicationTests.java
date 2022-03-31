@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 
 import com.example.demo.controller.ContactController;
+import com.example.demo.model.Tag;
 import com.example.demo.model.Contact;
 import com.example.demo.repository.ContactRepository;
 
@@ -41,6 +42,7 @@ class DemoApplicationTests {
 			new Contact("David", "Palmer", "david.palmer@gmx.com", "9999 9999", ""),
 			new Contact("Michelle", "Dessler", "michelle.dessler@company.com", "+61 2 9999 9999", ""),
 		};
+		contacts[0].addTag(new Tag("favorites"));
 		for (Contact contact : contacts) {
 			repository.save(contact);
 		}
@@ -57,6 +59,11 @@ class DemoApplicationTests {
 		// Fetch contacts by last name
 		String needle = "Bauer";
 		repository.findByLastName(needle).forEach(bauer -> {
+			assertThat(bauer.getLastName()).isEqualTo(needle);
+		});
+
+		// Fetch contact by tag id
+		repository.findByTagId(1L).forEach(bauer -> {
 			assertThat(bauer.getLastName()).isEqualTo(needle);
 		});
 	}

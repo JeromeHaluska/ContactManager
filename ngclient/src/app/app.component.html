@@ -11,8 +11,9 @@
           <a (click)="redirectTo('/add')" class="nav-link" href="javascript:void(0)">New Contact</a>
         </li>
       </ul>
-      <!-- Reset database records -->
-      <button class="btn btn-outline-danger" (click)="resetDb()">Reset</button>
+      <!-- Database operations (clear and reset) -->
+      <button class="btn btn-outline-danger me-1" (click)="resetDb(0)">Clear</button>
+      <button class="btn btn-outline-danger" (click)="resetDb(10)">Reset</button>
     </div>
   </div>
 </nav>
@@ -20,12 +21,11 @@
 <main class="py-5">
   <div class="container">
     <div class="row">
+      <!-- Tag subnavigation -->
       <div class="col-md-3">
-        <div class="list-group mb-3">
-          <a (click)="redirectTo('/all')" href="javascript:void(0)" class="list-group-item d-flex justify-content-between active">All Contacts <span class="badge bg-secondary">{{ numberOfContacts }}</span></a>
-          <a href="javascript:void(0)" class="list-group-item disabled">Recent</a>
-          <a href="javascript:void(0)" class="list-group-item disabled">Favorites</a>
-          <a href="javascript:void(0)" class="list-group-item disabled">Other</a>
+        <div *ngIf="tags.length" class="list-group mb-3">
+          <a (click)="redirectTo('/all')" href="javascript:void(0)" [ngClass]="{'active': activeTagTitle === ''}" class="list-group-item">All Contacts</a>
+          <a *ngFor="let tag of tags" (click)="redirectTo('/all/' + tag.title)" [ngClass]="{'active': tag.title === activeTagTitle}" href="javascript:void(0)" class="list-group-item text-capitalize">{{ tag.title }}</a>
         </div>
       </div>
       <div class="col-md-9">

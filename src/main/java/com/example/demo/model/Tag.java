@@ -1,9 +1,15 @@
 package com.example.demo.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Tag {
@@ -11,7 +17,13 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
+    @NotBlank(message = "Title is mandatory")
+    @Column(unique = true)
     private String title;
+
+    @ManyToMany(mappedBy = "tags")
+    private Set<Contact> contacts = new HashSet<>();
 
     protected Tag() {}
 
@@ -19,8 +31,17 @@ public class Tag {
         this.title = title;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Tag[id=%d, title='%s']", id, title);
+    }
+
     public long getId() {
         return id;
+    }
+    
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {

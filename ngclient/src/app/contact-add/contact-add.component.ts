@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Contact } from '../contact';
 import { ContactService } from '../contact.service';
+import { Tag } from '../tag';
+import { TagService } from '../tag.service';
 
 @Component({
   selector: 'app-contact-add',
@@ -15,10 +17,10 @@ export class ContactAddComponent implements OnInit {
   isLoading = false;
   isPrefill = false;
   errorMessage = '';
-  tagPreview: string[] = [];
+  tagPreview: Tag[] = [];
   contact: Contact = new Contact();
 
-  constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private contactService: ContactService, private tagService: TagService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
     // Get contact data to prefill input fields
@@ -26,6 +28,7 @@ export class ContactAddComponent implements OnInit {
     if (updateId > 0) {
       this.contactService.findById(updateId).subscribe(contact => {
         this.contact = contact;
+        this.tagPreview = contact.tags;
         this.isPrefill = true;
       });
     }
@@ -35,13 +38,7 @@ export class ContactAddComponent implements OnInit {
     // Prepare api request
     let stream$: Observable<Contact>;
     this.isLoading = true;
-    // Check if used tags exist in database and add them if needed
-    // Also prepare tags objects for contact
-    // let tags: Tag[] = [];
-    this.tagPreview.forEach((tagTitle) => {
-      //tagService.findByTitle(tagTitle).subscribe((tag) => { tags.add(tag); });
-      //if tag !exists tagService.add(new Tag(tagTitle));
-    });
+    this.errorMessage = '';
     if (this.isPrefill) {
       // Update existing record
       this.contact.firstName = f.value.firstName;
@@ -49,11 +46,11 @@ export class ContactAddComponent implements OnInit {
       this.contact.email = f.value.email;
       this.contact.phone = f.value.phone;
       this.contact.description = f.value.description;
-      //this.contact.tags = tags;
+      this.contact.tags = this.tagPreview;
       stream$ = this.contactService.update(this.contact);
     } else {
       // Create new record
-      let newContact = new Contact(f.value.firstName, f.value.lastName, f.value.email, f.value.phone, f.value.description);
+      let newContact = new Contact(f.value.firstName, f.value.lastName, f.value.email, f.value.phone, f.value.description, this.tagPreview);
       stream$ = this.contactService.add(newContact);
     }
     stream$.subscribe({
@@ -70,19 +67,20 @@ export class ContactAddComponent implements OnInit {
   updatePreviewTags($event: Event): void {
     let inputValue = ($event.target as HTMLInputElement).value;
     if (inputValue.endsWith(' ')) {
-      inputValue.split(' ').forEach(newTag => {
-        if (newTag === '') return;
-        let finalName = newTag.charAt(0).toUpperCase() + newTag.slice(1);
-        if (!this.tagPreview.includes(finalName)) { this.tagPreview.push(finalName) };
-        inputValue = inputValue.replace(newTag, '');
+      inputValue.split(' ').forEach(tagTitle => {
+        if (tagTitle === '') return;
+        tagTitle = tagTitle.toLowerCase();
+        let newTag = new Tag(tagTitle);
+        if (!this.tagPreview.some(tag => tag.title === tagTitle)) { this.tagPreview.push(newTag) };
+        inputValue = inputValue.replace(tagTitle, '');
       });
       ($event.target as HTMLInputElement).value = '';
     }
   }
 
   removePreviewTag(tagName: string) {
-    this.tagPreview.forEach((value, id) => {
-      if (tagName === value) {
+    this.tagPreview.forEach((tag, id) => {
+      if (tagName === tag.title) {
         this.tagPreview.splice(id, 1);
       }
     });

@@ -3,7 +3,6 @@ package com.example.demo.model;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +39,7 @@ public class Contact {
     @NotNull(message = "Description may not be null")
     private String description;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany()
     @JoinTable(
         name = "Contact_Tag", 
         joinColumns = { @JoinColumn(name = "contact_id") }, 
@@ -61,8 +60,8 @@ public class Contact {
     @Override
     public String toString() {
         return String.format(
-            "Contact[id=%d, firstName='%s', lastName='%s', email='%s', phone='%s', description='%s']",
-            id, firstName, lastName, email, phone, description);
+            "Contact[id=%d, firstName='%s', lastName='%s', email='%s', phone='%s', description='%15.15s...', tags='%s']",
+            id, firstName, lastName, email, phone, description, tags.toString());
     }
 
     public long getId() {
@@ -113,11 +112,15 @@ public class Contact {
         return tags;
     }
 
+    public void setTags(Set<Tag> newTags) {
+        tags = newTags;
+    }
+
     public void addTag(Tag tag) {
-        this.tags.add(tag);
+        tags.add(tag);
     }
 
     public void removeTag(Tag tag) {
-        this.tags.remove(tag);
+        tags.remove(tag);
     }
 }

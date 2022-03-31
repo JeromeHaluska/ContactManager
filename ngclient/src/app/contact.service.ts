@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Contact } from './contact';
-import { forkJoin, Observable, ReplaySubject, Subscriber } from 'rxjs';
+import { combineLatest, forkJoin, Observable, ReplaySubject, Subscriber } from 'rxjs';
+import { TagService } from './tag.service';
 
 @Injectable()
 export class ContactService {
@@ -9,7 +10,7 @@ export class ContactService {
   private contactsSubject = new ReplaySubject<Contact[]>(1);
   private contacts$: Observable<Contact[]>;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private tagService: TagService) {
     this.contacts$ = this.contactsSubject.asObservable();
     this.fetchAll();
   }
@@ -31,7 +32,9 @@ export class ContactService {
   private fetchAndPassResponseThrough(subscriber: Subscriber<any>, stream$: Observable<any>) {
     stream$.subscribe({
       next: data => {
-        this.fetchAll().subscribe(() => {
+        console.log('Fetch data recieved', data);
+        combineLatest([this.tagService.fetchAll(), this.fetchAll()]).subscribe(() => {
+          console.log('Refreshed contacts and tag records');
           subscriber.next(data);
           subscriber.complete();
         });
@@ -53,12 +56,6 @@ export class ContactService {
   public update(contact: Contact): Observable<Contact> {
     let updateAndFetch$ = new Observable<Contact>(subscriber => {
       this.fetchAndPassResponseThrough(subscriber, this.http.put<Contact>(this.apiUrl + contact.id, contact));
-      /*this.http.put<Contact>(this.apiUrl + contact.id, contact).subscribe(data => {
-        this.fetchAll().subscribe(() => {
-          subscriber.next(data);
-          subscriber.complete();
-        });
-      });*/
     });
     return updateAndFetch$;
   }
@@ -71,53 +68,36 @@ export class ContactService {
   }
 
   public addList(contacts: Contact[]): Observable<Contact[]> {
-    // Prepare deletion of multiple contacts
+    // Prepare creation of multiple contacts
     let streams$: Observable<Contact>[] = [];
     contacts.forEach((contact: Contact) => streams$.push(this.http.post<Contact>(this.apiUrl, contact)));
-    // Create combined observer for deletion
+    // Create combined observer for creation
     let addAndFetch$ = new Observable<Contact[]>(subscriber => {
       if (contacts.length === 0) {
         subscriber.next();
         subscriber.complete();
       }
-      forkJoin(streams$).subscribe(data => {
+      this.fetchAndPassResponseThrough(subscriber, forkJoin(streams$));
+      /*forkJoin(streams$).subscribe(data => {
         this.fetchAll().subscribe(() => {
           subscriber.next(data);
           subscriber.complete();
         });
-      });
+      });*/
     });
     return addAndFetch$;
   }
 
   public delete(contact: Contact): Observable<Contact> {
     let deleteAndFetch$ = new Observable<Contact>(subscriber => {
-      this.http.delete<Contact>(this.apiUrl + contact.id).subscribe(data => {
-        this.fetchAll().subscribe(() => {
-          subscriber.next(data);
-          subscriber.complete();
-        });
-      })
+      this.fetchAndPassResponseThrough(subscriber, this.http.delete<Contact>(this.apiUrl + contact.id));
     });
     return deleteAndFetch$;
   }
 
-  public deleteList(contacts: Contact[]): Observable<Contact[]> {
-    // Prepare deletion of multiple contacts
-    let streams$: Observable<Contact>[] = [];
-    contacts.forEach((contact: Contact) => streams$.push(this.http.delete<Contact>(this.apiUrl + contact.id)));
-    // Create combined observer for deletion
-    let deleteAndFetch$ = new Observable<Contact[]>(subscriber => {
-      if (contacts.length === 0) {
-        subscriber.next();
-        subscriber.complete();
-      }
-      forkJoin(streams$).subscribe(data => {
-        this.fetchAll().subscribe(() => {
-          subscriber.next(data);
-          subscriber.complete();
-        });
-      });
+  public deleteAll(): Observable<HttpResponse<Contact>> {
+    let deleteAndFetch$ = new Observable<HttpResponse<Contact>>(subscriber => {
+      this.fetchAndPassResponseThrough(subscriber, this.http.delete<HttpResponse<Contact>>(this.apiUrl));
     });
     return deleteAndFetch$;
   }

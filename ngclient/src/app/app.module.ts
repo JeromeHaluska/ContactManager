@@ -9,6 +9,7 @@ import { ContactDetailsComponent } from './contact-details/contact-details.compo
 import { ContactListComponent } from './contact-list/contact-list.component';
 import { ContactService } from './contact.service';
 import { ContactAddComponent } from './contact-add/contact-add.component';
+import { TagService } from './tag.service';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ContactAddComponent } from './contact-add/contact-add.component';
     RouterModule.forRoot(
       [
         { path: "all", component: ContactListComponent},
+        { path: "all/:tag", component: ContactListComponent},
         { path: "add", component: ContactAddComponent},
         { path: "contacts/:id/edit", component: ContactAddComponent},
         { path: "contacts/:id", component: ContactDetailsComponent}
@@ -32,7 +34,7 @@ import { ContactAddComponent } from './contact-add/contact-add.component';
       }
     )
   ],
-  providers: [HttpClient, ContactService],
+  providers: [HttpClient, ContactService, TagService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

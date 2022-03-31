@@ -2,10 +2,13 @@ package com.example.demo.controller;
 
 import com.example.demo.ContactNotFoundException;
 import com.example.demo.model.Contact;
+import com.example.demo.model.Tag;
 import com.example.demo.repository.ContactRepository;
+import com.example.demo.repository.TagRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +22,16 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:4200")
 public class ContactController {
     private final ContactRepository repository;
+    private final TagRepository tagRepository;
     private Logger logger = LoggerFactory.getLogger(ContactController.class);
 
-    public ContactController(ContactRepository contactRepository) {
+    public ContactController(ContactRepository contactRepository, TagRepository tagRepository) {
         this.repository = contactRepository;
+        this.tagRepository = tagRepository;
     }
 
     @GetMapping("/contacts")
-	public Iterable<Contact> getContacts() {
+	public Iterable<Contact> getAll() {
         logger.info("Listing of all contact records requested");
 		return repository.findAll();
 	}
@@ -38,15 +43,23 @@ public class ContactController {
     }
 
     @PutMapping("/contacts/{id}")
-    Contact updateContact(@RequestBody Contact newContact, @PathVariable Long id) {
-        logger.info("Update requested for contact record #" + id, newContact);
+    Contact update(@RequestBody Contact newContact, @PathVariable Long id) {
+        String loggerPrefix = "[" + newContact.getFirstName().charAt(0) + newContact.getLastName().charAt(0) + "] ";
+        logger.info(loggerPrefix + "Update requested for contact record #" + id);
         logger.info(newContact.toString());
+        // Persist unkown contact tags and prepare existing tags for saving
+        for (Tag tag : newContact.getTags()) {
+            boolean isExisting = tagRepository.existsByTitle(tag.getTitle());
+            logger.info(loggerPrefix + (isExisting ? "Use existing tag record for title '" + tag.getTitle() + "'" : "Create new tag record with title '" + tag.getTitle() + "'"));
+            try {
+                Tag newTag = isExisting ? tagRepository.findByTitle(tag.getTitle()) : tagRepository.save(tag);
+                tag.setId(newTag.getId());
+            } catch (Exception e) {
+                logger.info(loggerPrefix + "Something went wrong with tag creation");
+            }
+        }
         return repository.findById(id).map(contact -> {
-            contact.setFirstName(newContact.getFirstName());
-            contact.setLastName(newContact.getLastName());
-            contact.setEmail(newContact.getEmail());
-            contact.setPhone(newContact.getPhone());
-            contact.setDescription(newContact.getDescription());
+            BeanUtils.copyProperties(newContact, contact);
             return repository.save(contact);
         }).orElseGet(() -> {
             return repository.save(newContact);
@@ -54,19 +67,41 @@ public class ContactController {
     }
 
     @PostMapping("/contacts")
-    void addContact(@RequestBody Contact contact) {
+    Contact add(@RequestBody Contact contact) {
+        String loggerPrefix = "[" + contact.getFirstName().charAt(0) + contact.getLastName().charAt(0) + "] ";
+        logger.info(loggerPrefix + "Creation of new contact record requested");
+        logger.info(contact.toString());
+        // Persist unkown contact tags and prepare existing tags for saving
+        for (Tag tag : contact.getTags()) {
+            boolean isExisting = tagRepository.existsByTitle(tag.getTitle());
+            logger.info(loggerPrefix + (isExisting ? "Use existing tag record for title '" + tag.getTitle() + "'" : "Create new tag record with title '" + tag.getTitle() + "'"));
+            try {
+                Tag newTag = isExisting ? tagRepository.findByTitle(tag.getTitle()) : tagRepository.save(tag);
+                tag.setId(newTag.getId());
+            } catch (Exception e) {
+                logger.info(loggerPrefix + "Something went wrong with tag creation");
+            }
+        }
+        // Persist new contact
         Contact newContact = repository.save(contact);
-        logger.info("Created contact record #" + newContact.getId());
-        logger.info(newContact.toString());
+        logger.info(loggerPrefix + "Saved contact record #" + newContact.getId());
+        return newContact;
     }
 
     @DeleteMapping("/contacts/{id}")
-    void deleteContact(@PathVariable Long id) {
+    void delete(@PathVariable Long id) {
         logger.info("Deletion requested for contact record #" + id);
+        if (!repository.existsById(id)) { throw new ContactNotFoundException(id); }
         try {
             repository.deleteById(id);
         } catch (IllegalArgumentException e) {
             throw new ContactNotFoundException(id);
         }
+    }
+
+    @DeleteMapping("/contacts")
+    void deleteAll() {
+        logger.info("Deletion requested for all contact records");
+        repository.deleteAll();
     }
 }
