@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.Version;
 import javax.persistence.JoinColumn;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -18,6 +19,10 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Contact {
     
+    @Version
+    @NotNull
+    private Long version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

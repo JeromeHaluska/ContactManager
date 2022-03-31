@@ -33,13 +33,13 @@ public class TagController {
 	}
 
     @GetMapping("/tags/{id}")
-    Tag getById(@PathVariable Long id) {
+    public Tag getById(@PathVariable Long id) {
         logger.info("Info requested for tag record #" + id);
         return repository.findById(id).orElseThrow(() -> new TagNotFoundException(id));
     }
 
     @PutMapping("/tags/{id}")
-    Tag update(@RequestBody Tag newTag, @PathVariable Long id) {
+    public Tag update(@RequestBody Tag newTag, @PathVariable Long id) {
         logger.info("Update requested for tag record #" + id);
         logger.info(newTag.toString());
         return repository.findById(id).map(tag -> {
@@ -51,7 +51,7 @@ public class TagController {
     }
 
     @PostMapping("/tags")
-    Tag add(@RequestBody Tag tag) {
+    public Tag add(@RequestBody Tag tag) {
         if (repository.existsByTitle(tag.getTitle())) {
             logger.info("Creation of tag #" + tag.getId() + " skipped because a record with this title already exists");
             return repository.findByTitle(tag.getTitle());
@@ -64,7 +64,7 @@ public class TagController {
     }
 
     @DeleteMapping("/tags/{id}")
-    void delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         logger.info("Deletion requested for tag record #" + id);
         if (!repository.existsById(id)) { throw new TagNotFoundException(id); }
         try {
@@ -75,7 +75,7 @@ public class TagController {
     }
 
     @DeleteMapping("/tags")
-    void deleteAll() {
+    public void deleteAll() {
         logger.info("Deletion requested for all tag records");
         repository.deleteAll();
     }

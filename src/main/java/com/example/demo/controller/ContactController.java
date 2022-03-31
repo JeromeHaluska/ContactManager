@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.example.demo.ContactNotFoundException;
 import com.example.demo.model.Contact;
 import com.example.demo.model.Tag;
@@ -37,51 +40,40 @@ public class ContactController {
 	}
 
     @GetMapping("/contacts/{id}")
-    Contact getById(@PathVariable Long id) {
+    public Contact getById(@PathVariable Long id) {
         logger.info("Info requested for contact record #" + id);
         return repository.findById(id).orElseThrow(() -> new ContactNotFoundException(id));
     }
 
     @PutMapping("/contacts/{id}")
-    Contact update(@RequestBody Contact newContact, @PathVariable Long id) {
+    public Contact update(@RequestBody Contact newContact, @PathVariable Long id) {
         String loggerPrefix = "[" + newContact.getFirstName().charAt(0) + newContact.getLastName().charAt(0) + "] ";
         logger.info(loggerPrefix + "Update requested for contact record #" + id);
         logger.info(newContact.toString());
-        // Persist unkown contact tags and prepare existing tags for saving
-        for (Tag tag : newContact.getTags()) {
-            boolean isExisting = tagRepository.existsByTitle(tag.getTitle());
-            logger.info(loggerPrefix + (isExisting ? "Use existing tag record for title '" + tag.getTitle() + "'" : "Create new tag record with title '" + tag.getTitle() + "'"));
-            try {
-                Tag newTag = isExisting ? tagRepository.findByTitle(tag.getTitle()) : tagRepository.save(tag);
-                tag.setId(newTag.getId());
-            } catch (Exception e) {
-                logger.info(loggerPrefix + "Something went wrong with tag creation");
-            }
-        }
         return repository.findById(id).map(contact -> {
             BeanUtils.copyProperties(newContact, contact);
-            return repository.save(contact);
+            return add(contact);
         }).orElseGet(() -> {
-            return repository.save(newContact);
+            return add(newContact);
         });
     }
 
     @PostMapping("/contacts")
-    Contact add(@RequestBody Contact contact) {
+    public Contact add(@RequestBody Contact contact) {
         String loggerPrefix = "[" + contact.getFirstName().charAt(0) + contact.getLastName().charAt(0) + "] ";
-        logger.info(loggerPrefix + "Creation of new contact record requested");
-        logger.info(contact.toString());
         // Persist unkown contact tags and prepare existing tags for saving
+        Set<Tag> newTags = new HashSet<>();
         for (Tag tag : contact.getTags()) {
             boolean isExisting = tagRepository.existsByTitle(tag.getTitle());
             logger.info(loggerPrefix + (isExisting ? "Use existing tag record for title '" + tag.getTitle() + "'" : "Create new tag record with title '" + tag.getTitle() + "'"));
             try {
                 Tag newTag = isExisting ? tagRepository.findByTitle(tag.getTitle()) : tagRepository.save(tag);
-                tag.setId(newTag.getId());
+                newTags.add(newTag);
             } catch (Exception e) {
-                logger.info(loggerPrefix + "Something went wrong with tag creation");
+                logger.info(loggerPrefix + "Something went wrong with tag '" + tag.getTitle() + "' creation");
             }
         }
+        contact.setTags(newTags);
         // Persist new contact
         Contact newContact = repository.save(contact);
         logger.info(loggerPrefix + "Saved contact record #" + newContact.getId());
@@ -89,7 +81,7 @@ public class ContactController {
     }
 
     @DeleteMapping("/contacts/{id}")
-    void delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         logger.info("Deletion requested for contact record #" + id);
         if (!repository.existsById(id)) { throw new ContactNotFoundException(id); }
         try {
@@ -100,7 +92,7 @@ public class ContactController {
     }
 
     @DeleteMapping("/contacts")
-    void deleteAll() {
+    public void deleteAll() {
         logger.info("Deletion requested for all contact records");
         repository.deleteAll();
     }
