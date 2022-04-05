@@ -46,4 +46,11 @@ public class ApplicationExceptionAdvice {
     String tagNotFoundHandler(TagNotFoundException e) {
         return e.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(TagIsReferencedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    String tagIsReferencedHandler(TagIsReferencedException e) {
+        return e.getMessage();
+    }
 }

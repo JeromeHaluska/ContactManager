@@ -1,67 +1,68 @@
 <!-- Error and loading alert -->
 <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
-    {{ errorMessage }}
+  <strong>An error occurred!</strong> {{ errorMessage }}
 </div>
-<div *ngIf="!errorMessage && !contactsLoaded" class="alert alert-info mb-3" role="alert">
+<div *ngIf="!errorMessage && (contactDatasource.loading$ | async)" class="alert alert-info mb-3" role="alert">
   <div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading contact list...
 </div>
-<div *ngIf="contactsLoaded && !contacts.length" class="alert alert-info mb-3" role="alert">
-  No contact records found start by adding a new one through the "New Contact"-Button in the navigation bar.
-</div>
 
-<!-- Data table -->
-<div class="card" *ngIf="contactsLoaded && contacts.length">
-  <h5 class="card-header">
-      <div class="row">
-        <div class="col">
-          All Contacts
-        </div>
-        <div class="col">
-          <input (input)="updateSearch($event)" name="search" class="form-control" type="search" placeholder="Search" aria-label="Search">
-        </div>
-      </div>
-  </h5>
-  <div class="card-body p-0">
-    <table class="table table-hover overflow-auto m-0">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">First Name</th>
-          <th scope="col">Last Name</th>
-          <th scope="col">Email</th>
-          <th scope="col">Phone Number</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let contact of filteredContacts">
-          <td>{{ contact.id }}</td>
-          <td>{{ contact.firstName }}</td>
-          <td>{{ contact.lastName }}</td>
-          <td><a href="mailto:{{ contact.email }}">{{ contact.email }}</a></td>
-          <td>{{ contact.phone }}</td>
-          <td>
-            <!-- Contact actions -->
-            <div class="btn-group" role="group" aria-label="Contact actions">
-              <a routerLink="/contacts/{{ contact.id }}" class="btn btn-primary">Details</a>
-            </div>
-          </td>
-        </tr>
-      </tbody>
+<!-- Only show contact list when data is ready -->
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>All Contacts</mat-card-title>
+    <mat-card-subtitle *ngIf="activeTagTitle">Filtered by tag "{{ activeTagTitle }}"</mat-card-subtitle>
+    <mat-form-field appearance="fill" class="search-input">
+      <mat-label>Search Contacts</mat-label>
+      <input (input)="updateSearch()" matInput type="search" [(ngModel)]="searchValue">
+      <mat-hint>Filter by Name, Email or Phone</mat-hint>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Hide columns</mat-label>
+      <mat-select (selectionChange)="hideColumnsSelectionChange($event)" [(value)]="contactColumnsPrevSel" multiple>
+        <mat-option *ngFor="let col of contactColumns" [value]="col">{{ col }}</mat-option>
+      </mat-select>
+      <mat-hint>Select which columns to exclude</mat-hint>
+    </mat-form-field>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- Data table -->
+    <table mat-table [dataSource]="contactDatasource">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>No.</th>
+        <td mat-cell *matCellDef="let contact">{{contact.id}}</td>
+      </ng-container>
+      <ng-container matColumnDef="firstName">
+        <th mat-header-cell *matHeaderCellDef>First Name</th>
+        <td mat-cell *matCellDef="let contact">{{contact.firstName}}</td>
+      </ng-container>
+      <ng-container matColumnDef="lastName">
+        <th mat-header-cell *matHeaderCellDef>Last Name</th>
+        <td mat-cell *matCellDef="let contact">{{contact.lastName}}</td>
+      </ng-container>
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let contact"><a href="mailto:{{ contact.email }}">{{contact.email}}</a></td>
+      </ng-container>
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef>Phone Number</th>
+        <td mat-cell *matCellDef="let contact">{{contact.phone}}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let contact">
+          <a mat-icon-button color="primary" (click)="editContact(contact)">
+            <mat-icon>edit</mat-icon>
+          </a>
+          <a mat-icon-button color="warn" (click)="deleteContact(contact)">
+            <mat-icon>delete</mat-icon>
+          </a>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="contactColumnsFiltered"></tr>
+      <tr mat-row *matRowDef="let row; columns: contactColumnsFiltered;"></tr>
     </table>
-  </div>
-  <div class="card-footer">
-    <div class="row">
-      <div class="col">
-        <!-- Pagination -->
-        <ul class="pagination justify-content-center m-0">
-          <li class="page-item"><a class="page-link" href="javascript:void(0)">Previous</a></li>
-          <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a></li>
-          <li class="page-item active"><a class="page-link" aria-current="page" href="javascript:void(0)">2</a></li>
-          <li class="page-item"><a class="page-link" href="javascript:void(0)">3</a></li>
-          <li class="page-item"><a class="page-link" href="javascript:void(0)">Next</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+    <!-- Pagination -->
+    <mat-paginator [pageSizeOptions]="[10, 25, 100]" [pageSize]="10" [length]="contactDatasource.counter$ | async" (page)="updateTable($event)"></mat-paginator>
+  </mat-card-content>
+</mat-card>

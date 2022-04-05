@@ -18,5 +18,15 @@ CREATE TABLE `contact` (
   `content` longtext,
   `description` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
+  `version` bigint NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `contact_tag` (
+  `contact_id` bigint NOT NULL,
+  `tag_id` bigint NOT NULL,
+  PRIMARY KEY (`contact_id`,`tag_id`),
+  KEY `FKpneddg7gg88c2k534t9ird6b5` (`tag_id`),
+  CONSTRAINT `FK4kjpbhoeb2bb2xrcxt1cj2c9f` FOREIGN KEY (`contact_id`) REFERENCES `contact` (`id`),
+  CONSTRAINT `FKpneddg7gg88c2k534t9ird6b5` FOREIGN KEY (`tag_id`) REFERENCES `tag` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

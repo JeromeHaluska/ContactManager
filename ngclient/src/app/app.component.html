@@ -1,37 +1,42 @@
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container">
-    <a (click)="redirectTo('/all')" class="navbar-brand" href="javascript:void(0)">Contact Manager</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a (click)="redirectTo('/all')" class="nav-link" href="javascript:void(0)">List Contacts</a>
-        </li>
-        <li class="nav-item">
-          <a (click)="redirectTo('/add')" class="nav-link" href="javascript:void(0)">New Contact</a>
-        </li>
-      </ul>
-      <!-- Database operations (clear and reset) -->
-      <button class="btn btn-outline-danger me-1" (click)="resetDb(0)">Clear</button>
-      <button class="btn btn-outline-danger" (click)="resetDb(10)">Reset</button>
-    </div>
-  </div>
-</nav>
-<!-- Content -->
-<main class="py-5">
-  <div class="container">
-    <div class="row">
-      <!-- Tag subnavigation -->
-      <div class="col-md-3">
-        <div *ngIf="tags.length" class="list-group mb-3">
-          <a (click)="redirectTo('/all')" href="javascript:void(0)" [ngClass]="{'active': activeTagTitle === ''}" class="list-group-item">All Contacts</a>
-          <a *ngFor="let tag of tags" (click)="redirectTo('/all/' + tag.title)" [ngClass]="{'active': tag.title === activeTagTitle}" href="javascript:void(0)" class="list-group-item text-capitalize">{{ tag.title }}</a>
-        </div>
-      </div>
-      <div class="col-md-9">
-        <!-- Renders output of routerLink attribute evaluation -->
-        <router-outlet></router-outlet>
-      </div>
-    </div>
-  </div>
-</main>
+<mat-sidenav-container class="sidenav-container">
+  <!-- Tag subnavigation -->
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+      [mode]="(isHandset$ | async) ? 'over' : 'side'"
+      [opened]="(isHandset$ | async) === false">
+    <mat-toolbar>Tags</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/all" [ngClass]="{'active': activeTagTitle === ''}">All Contacts</a>
+      <a *ngFor="let tag of tags" mat-list-item routerLink="/all/{{ tag.title }}" class="text-capitalize" [ngClass]="{'active': tag.title === activeTagTitle}">
+        {{ tag.title }}
+        <button matSuffix mat-icon-button color="warn" class="align-right" aria-label="Delete Tag" (click)="deleteTag(tag)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <!-- Main Navigation -->
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span class="navbar-brand">Contact Manager</span>
+      <button mat-button routerLink="/all" class="mx-2">List Contacts</button>
+      <button mat-button routerLink="/add">New Contact</button>
+      <span class="nav-spacer"></span>
+      <button mat-stroked-button color="warn" (click)="resetDb()" class="me-2">Clear</button>
+      <button mat-stroked-button color="warn" (click)="openResetDialog()">Reset</button>
+    </mat-toolbar>
+    <!-- Content -->
+    <main class="m-5">
+      <!-- Renders output of routerLink attribute evaluation -->
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

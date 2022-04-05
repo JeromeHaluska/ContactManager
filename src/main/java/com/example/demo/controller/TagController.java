@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.TagIsReferencedException;
 import com.example.demo.TagNotFoundException;
 import com.example.demo.model.Tag;
+import com.example.demo.repository.ContactRepository;
 import com.example.demo.repository.TagRepository;
 
 import org.slf4j.Logger;
@@ -20,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:4200")
 public class TagController {
     private final TagRepository repository;
+    private final ContactRepository contactRepository;
     private Logger logger = LoggerFactory.getLogger(TagController.class);
 
-    public TagController(TagRepository tagRepository) {
+    public TagController(TagRepository tagRepository, ContactRepository contactRepository) {
         this.repository = tagRepository;
+        this.contactRepository = contactRepository;
     }
 
     @GetMapping("/tags")
@@ -67,6 +71,7 @@ public class TagController {
     public void delete(@PathVariable Long id) {
         logger.info("Deletion requested for tag record #" + id);
         if (!repository.existsById(id)) { throw new TagNotFoundException(id); }
+        if (contactRepository.existsByTagId(id)) { throw new TagIsReferencedException(id); }
         try {
             repository.deleteById(id);
         } catch (IllegalArgumentException e) {

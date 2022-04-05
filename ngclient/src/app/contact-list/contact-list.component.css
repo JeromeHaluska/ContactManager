@@ -1,0 +1,16 @@
+table {
+    width: 100%;
+}
+
+.search-input {
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+mat-card-title {
+    padding: 0.5rem 0rem;
+}
+
+a.mat-mini-fab {
+    margin-left: 0.5rem;
+}

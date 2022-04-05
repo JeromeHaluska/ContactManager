@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 
 @SpringBootTest
 class DemoApplicationTests {
@@ -63,7 +64,7 @@ class DemoApplicationTests {
 		});
 
 		// Fetch contact by tag id
-		repository.findByTagId(1L).forEach(bauer -> {
+		repository.findByTagId(PageRequest.of(0, 10), 1L).forEach(bauer -> {
 			assertThat(bauer.getLastName()).isEqualTo(needle);
 		});
 	}

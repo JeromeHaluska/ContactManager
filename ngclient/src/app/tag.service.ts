@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Tag } from './tag';
 import { forkJoin, Observable, ReplaySubject, Subscriber } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class TagService {
-  private apiUrl = 'http://localhost:8080/tags/';
+  private resourceUrl = 'tags';
   private tagsSubject = new ReplaySubject<Tag[]>(1);
   private tags$: Observable<Tag[]>;
 
@@ -30,7 +31,8 @@ export class TagService {
 
   // Request list of all tags from api
   public fetchAll(): Observable<Tag[]> {
-    this.http.get<Tag[]>(this.apiUrl).subscribe({
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
+    this.http.get<Tag[]>(endpoint).subscribe({
       next: tags => {
         this.tagsSubject.next(tags);
       },
@@ -47,27 +49,31 @@ export class TagService {
   }
 
   public findById(id: Number): Observable<Tag> {
-    return this.http.get<Tag>(this.apiUrl + id);
+    const endpoint = environment.apiBaseUrl + this.resourceUrl + '/' + id;
+    return this.http.get<Tag>(endpoint);
   }
 
   public update(tag: Tag): Observable<Tag> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl + '/' + tag.id;
     let updateAndFetch$ = new Observable<Tag>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.put<Tag>(this.apiUrl + tag.id, tag));
+      this.fetchAndPassResponseThrough(subscriber, this.http.put<Tag>(endpoint, tag));
     });
     return updateAndFetch$;
   }
 
   public add(tag: Tag): Observable<Tag> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
     let addAndFetch$ = new Observable<Tag>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.post<Tag>(this.apiUrl, tag));
+      this.fetchAndPassResponseThrough(subscriber, this.http.post<Tag>(endpoint, tag));
     });
     return addAndFetch$;
   }
 
   public addList(tags: Tag[]): Observable<Tag[]> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
     // Prepare creation of multiple tags
     let streams$: Observable<Tag>[] = [];
-    tags.forEach((tagsSubject: Tag) => streams$.push(this.http.post<Tag>(this.apiUrl, tagsSubject)));
+    tags.forEach((tagsSubject: Tag) => streams$.push(this.http.post<Tag>(endpoint, tagsSubject)));
     // Create combined observer for creation
     let addAndFetch$ = new Observable<Tag[]>(subscriber => {
       if (tags.length === 0) {
@@ -85,15 +91,17 @@ export class TagService {
   }
 
   public delete(tag: Tag): Observable<Tag> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl + '/' + tag.id;
     let deleteAndFetch$ = new Observable<Tag>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.delete<Tag>(this.apiUrl + tag.id));
+      this.fetchAndPassResponseThrough(subscriber, this.http.delete<Tag>(endpoint));
     });
     return deleteAndFetch$;
   }
 
   public deleteAll(): Observable<HttpResponse<Tag>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
     let deleteAndFetch$ = new Observable<HttpResponse<Tag>>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.delete<HttpResponse<Tag>>(this.apiUrl));
+      this.fetchAndPassResponseThrough(subscriber, this.http.delete<HttpResponse<Tag>>(endpoint));
     });
     return deleteAndFetch$;
   }

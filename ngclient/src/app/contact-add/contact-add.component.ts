@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { Contact } from '../contact';
 import { ContactService } from '../contact.service';
 import { Tag } from '../tag';
-import { TagService } from '../tag.service';
 
 @Component({
   selector: 'app-contact-add',
@@ -20,7 +19,7 @@ export class ContactAddComponent implements OnInit {
   tagPreview: Tag[] = [];
   contact: Contact = new Contact();
 
-  constructor(private contactService: ContactService, private tagService: TagService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
     // Get contact data to prefill input fields
@@ -36,7 +35,7 @@ export class ContactAddComponent implements OnInit {
 
   onSubmit(f: NgForm): void {
     // Prepare api request
-    let stream$: Observable<Contact>;
+    let stream$: Observable<HttpResponse<void>>;
     this.isLoading = true;
     this.errorMessage = '';
     if (this.isPrefill) {

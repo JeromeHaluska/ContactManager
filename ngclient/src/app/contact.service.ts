@@ -1,40 +1,80 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Contact } from './contact';
-import { combineLatest, forkJoin, Observable, ReplaySubject, Subscriber } from 'rxjs';
+import { combineLatest, Observable, Subscriber } from 'rxjs';
 import { TagService } from './tag.service';
+import { RestResponse } from './rest-response';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class ContactService {
-  private apiUrl = 'http://localhost:8080/contacts/';
-  private contactsSubject = new ReplaySubject<Contact[]>(1);
-  private contacts$: Observable<Contact[]>;
+  private resourceUrl = 'contacts';
 
-  constructor(private http: HttpClient, private tagService: TagService) {
-    this.contacts$ = this.contactsSubject.asObservable();
-    this.fetchAll();
+  constructor(private http: HttpClient, private tagService: TagService) {}
+
+  public findAll(page = 0, size = 10, tagTitle = ''): Observable<RestResponse<Contact>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
+    let params = { page, size, tag: tagTitle };
+    return this.http.get<RestResponse<Contact>>(endpoint, { params });
   }
 
-  // Request list of all contacts from api
-  private fetchAll(): Observable<Contact[]> {
-    this.http.get<Contact[]>(this.apiUrl).subscribe({
-      next: contacts => {
-        this.contactsSubject.next(contacts);
-      },
-      error: error => {
-        this.contactsSubject.error(error);
-        console.error('An error occurred while fetching contact list!', error);
-      }
+  public findById(id: Number): Observable<Contact> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl + '/' + id;
+    return this.http.get<Contact>(endpoint);
+  }
+
+  public update(contact: Contact): Observable<HttpResponse<void>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl + '/' + contact.id;
+    let updateAndFetch$ = new Observable<HttpResponse<void>>(subscriber => {
+      this.fetchAndPassResponseThrough(subscriber, this.http.put<HttpResponse<void>>(endpoint, contact));
     });
-    return this.findAll();
+    return updateAndFetch$;
   }
 
-  private fetchAndPassResponseThrough(subscriber: Subscriber<any>, stream$: Observable<any>) {
+  public add(contact: Contact): Observable<HttpResponse<void>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
+    let addAndFetch$ = new Observable<HttpResponse<void>>(subscriber => {
+      this.fetchAndPassResponseThrough(subscriber, this.http.post<HttpResponse<void>>(endpoint, contact));
+    });
+    return addAndFetch$;
+  }
+
+  public addList(contacts: Contact[]): Observable<HttpResponse<void>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
+    // Prepare creation of multiple contacts
+    let streams$: Observable<HttpResponse<void>>[] = [];
+    contacts.forEach((contact: Contact) => streams$.push(this.http.post<HttpResponse<void>>(endpoint, contact)));
+    // Create combined observer for creation
+    let addAndFetch$ = new Observable<HttpResponse<void>>(subscriber => {
+      if (contacts.length === 0) {
+        subscriber.next();
+        subscriber.complete();
+      }
+      this.fetchAndPassResponseThrough(subscriber, combineLatest(streams$));
+    });
+    return addAndFetch$;
+  }
+
+  public delete(contact: Contact): Observable<HttpResponse<void>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl + '/' + contact.id;
+    let deleteAndFetch$ = new Observable<HttpResponse<void>>(subscriber => {
+      this.fetchAndPassResponseThrough(subscriber, this.http.delete<HttpResponse<void>>(endpoint));
+    });
+    return deleteAndFetch$;
+  }
+
+  public deleteAll(): Observable<HttpResponse<void>> {
+    const endpoint = environment.apiBaseUrl + this.resourceUrl;
+    let deleteAndFetch$ = new Observable<HttpResponse<void>>(subscriber => {
+      this.fetchAndPassResponseThrough(subscriber, this.http.delete<HttpResponse<void>>(endpoint));
+    });
+    return deleteAndFetch$;
+  }
+
+  private fetchAndPassResponseThrough(subscriber: Subscriber<any>, stream$: Observable<any>): void {
     stream$.subscribe({
       next: data => {
-        console.log('Fetch data recieved', data);
-        combineLatest([this.tagService.fetchAll(), this.fetchAll()]).subscribe(() => {
-          console.log('Refreshed contacts and tag records');
+        this.tagService.fetchAll().subscribe(() => {
           subscriber.next(data);
           subscriber.complete();
         });
@@ -43,62 +83,5 @@ export class ContactService {
         subscriber.error(error);
       }
     });
-  }
-
-  public findAll(): Observable<Contact[]> {
-    return this.contacts$;
-  }
-
-  public findById(id: Number): Observable<Contact> {
-    return this.http.get<Contact>(this.apiUrl + id);
-  }
-
-  public update(contact: Contact): Observable<Contact> {
-    let updateAndFetch$ = new Observable<Contact>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.put<Contact>(this.apiUrl + contact.id, contact));
-    });
-    return updateAndFetch$;
-  }
-
-  public add(contact: Contact): Observable<Contact> {
-    let addAndFetch$ = new Observable<Contact>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.post<Contact>(this.apiUrl, contact));
-    });
-    return addAndFetch$;
-  }
-
-  public addList(contacts: Contact[]): Observable<Contact[]> {
-    // Prepare creation of multiple contacts
-    let streams$: Observable<Contact>[] = [];
-    contacts.forEach((contact: Contact) => streams$.push(this.http.post<Contact>(this.apiUrl, contact)));
-    // Create combined observer for creation
-    let addAndFetch$ = new Observable<Contact[]>(subscriber => {
-      if (contacts.length === 0) {
-        subscriber.next();
-        subscriber.complete();
-      }
-      this.fetchAndPassResponseThrough(subscriber, forkJoin(streams$));
-      /*forkJoin(streams$).subscribe(data => {
-        this.fetchAll().subscribe(() => {
-          subscriber.next(data);
-          subscriber.complete();
-        });
-      });*/
-    });
-    return addAndFetch$;
-  }
-
-  public delete(contact: Contact): Observable<Contact> {
-    let deleteAndFetch$ = new Observable<Contact>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.delete<Contact>(this.apiUrl + contact.id));
-    });
-    return deleteAndFetch$;
-  }
-
-  public deleteAll(): Observable<HttpResponse<Contact>> {
-    let deleteAndFetch$ = new Observable<HttpResponse<Contact>>(subscriber => {
-      this.fetchAndPassResponseThrough(subscriber, this.http.delete<HttpResponse<Contact>>(this.apiUrl));
-    });
-    return deleteAndFetch$;
   }
 }

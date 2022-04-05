@@ -1,7 +1,11 @@
+import { ComponentType } from '@angular/cdk/portal';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
+import { filter, Observable } from 'rxjs';
 import { Contact } from '../contact';
 import { ContactService } from '../contact.service';
+import { AlertDialogComponent } from '../dialogs/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-contact-details',
@@ -11,9 +15,14 @@ import { ContactService } from '../contact.service';
 export class ContactDetailsComponent implements OnInit {
   errorMessage: string = '';
   contact!: Contact;
-  editMode: boolean = false;
+  previousUrl = '/all';
 
-  constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private contactService: ContactService, private route: ActivatedRoute, private router: Router, private dialog: MatDialog) {
+    let nav = this.router.getCurrentNavigation();
+    if (nav && nav.extras && nav.extras.state) {
+      this.previousUrl = nav.extras.state['previousUrl'] || this.previousUrl;
+    }
+  }
 
   ngOnInit(): void {
     this.contactService.findById(Number(this.route.snapshot.paramMap.get('id'))).subscribe({
@@ -27,14 +36,29 @@ export class ContactDetailsComponent implements OnInit {
   }
 
   editContact(contact: Contact) {
-    this.router.navigate(['contacts/' + contact.id + '/edit']);
+    this.router.navigate(['contacts', contact.id, 'edit']);
   }
 
   deleteContact(contact: Contact) {
-    if (confirm('You\'re about to remove contact #' + contact.id + ' permanently. Continue?')) {
-      this.contactService.delete(contact).subscribe(() => {
-        this.router.navigate(['/all']);
-      });
-    }
+    // Open contact deletion confirmation dialog
+    this.openDialog<boolean>(AlertDialogComponent, {
+      data: { title: 'Warning', text: 'You\'re about to remove contact #' + contact.id + ' permanently. Continue?', showButtonDecline: true },
+      width: '400px',
+    }, (hasAccepted) => {
+      if (hasAccepted) {
+        this.contactService.delete(contact).subscribe(() => {
+          this.router.navigate([this.previousUrl]);
+        });
+      }
+    });
+  }
+
+  redirectBack() {
+    this.router.navigate([this.previousUrl]);
+  }
+  
+  private openDialog<D>(component: ComponentType<any>, options: MatDialogConfig, afterClosedFunc?: (value: D) => void) {
+    let dialogRef = this.dialog.open(component, options);
+    dialogRef.afterClosed().subscribe(afterClosedFunc!);
   }
 }
