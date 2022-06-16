@@ -46,8 +46,9 @@ public class ContactController {
         Set<Tag> newTags = new HashSet<>();
         for (Tag tag : contact.getTags()) {
             boolean isExisting = tagRepository.existsByTitle(tag.getTitle());
-            logger.info((isExisting ? "Used existing tag record for title '" + tag.getTitle() + "'" :
-                "Created new tag record with title '" + tag.getTitle() + "'"));
+            if (!isExisting) {
+                logger.info("Create new tag record with title '" + tag.getTitle() + "'");
+            }
             try {
                 Tag newTag = isExisting ? tagRepository.findByTitle(tag.getTitle()) : tagRepository.save(tag);
                 newTags.add(newTag);
