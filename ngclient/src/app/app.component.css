@@ -44,3 +44,7 @@ mat-icon {
 a:hover mat-icon {
 	display: inline;
 }
+
+.badge {
+    font-size: 1em;
+}
