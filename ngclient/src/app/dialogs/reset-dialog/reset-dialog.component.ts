@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./reset-dialog.component.css']
 })
 export class ResetDialogComponent {
-  recordSize: number = 10;
+  recordSize: number = 0;
 
   constructor() {}
 }
