@@ -1,7 +1,8 @@
 CREATE DATABASE db_contacts;
+USE db_contacts;
+--Creating the database user is essential for running the application
 CREATE user 'springuser'@'%' identified BY 'ThePassword';
 GRANT all ON db_contacts.* TO 'springuser'@'%';
-USE db_contacts;
 
 CREATE TABLE `tag` (
   `id` bigint NOT NULL,
