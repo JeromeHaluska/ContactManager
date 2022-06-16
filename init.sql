@@ -1,6 +1,6 @@
 CREATE DATABASE db_contacts;
 CREATE user 'springuser'@'%' identified BY 'ThePassword';
-GRANT all ON db_example.* TO 'springuser'@'%';
+GRANT all ON db_contacts.* TO 'springuser'@'%';
 USE db_contacts;
 
 CREATE TABLE `tag` (
@@ -15,7 +15,6 @@ CREATE TABLE `contact` (
   `email` varchar(255) DEFAULT NULL,
   `first_name` varchar(255) DEFAULT NULL,
   `last_name` varchar(255) DEFAULT NULL,
-  `content` longtext,
   `description` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `version` bigint NOT NULL,
