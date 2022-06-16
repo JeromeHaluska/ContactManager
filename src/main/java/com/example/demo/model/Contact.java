@@ -47,7 +47,7 @@ public class Contact {
     @NotNull(message = "Description may not be null")
     private String description;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
         name = "Contact_Tag", 
         joinColumns = { @JoinColumn(name = "contact_id") }, 

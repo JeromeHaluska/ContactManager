@@ -3,6 +3,7 @@ package com.example.demo.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ public class Tag {
     @Column(unique = true)
     private String title;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.MERGE)
     private Set<Contact> contacts = new HashSet<>();
 
     protected Tag() {}
