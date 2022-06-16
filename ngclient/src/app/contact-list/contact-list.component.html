@@ -2,9 +2,9 @@
 <div *ngIf="errorMessage" class="alert alert-danger mb-3" role="alert">
   <strong>An error occurred!</strong> {{ errorMessage }}
 </div>
-<div *ngIf="!errorMessage && (contactDatasource.loading$ | async)" class="alert alert-info mb-3" role="alert">
+<!--<div *ngIf="!errorMessage && (contactDatasource.loading$ | async)" class="alert alert-info mb-3" role="alert">
   <div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading contact list...
-</div>
+</div>-->
 
 <!-- Only show contact list when data is ready -->
 <mat-card>
