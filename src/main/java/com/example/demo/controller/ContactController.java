@@ -41,18 +41,19 @@ public class ContactController {
         this.tagRepository = tagRepository;
     }
 
-    private void persistTags(Contact contact) {
+    private synchronized void persistTags(Contact contact) {
         // Persist unkown contact tags and prepare existing tags for saving
         Set<Tag> newTags = new HashSet<>();
         for (Tag tag : contact.getTags()) {
             boolean isExisting = tagRepository.existsByTitle(tag.getTitle());
+            logger.info((isExisting ? "Used existing tag record for title '" + tag.getTitle() + "'" :
+                "Created new tag record with title '" + tag.getTitle() + "'"));
             try {
                 Tag newTag = isExisting ? tagRepository.findByTitle(tag.getTitle()) : tagRepository.save(tag);
-                logger.info((isExisting ? "Used existing tag record for title '" + tag.getTitle() + "'" :
-                    "Created new tag record with title '" + tag.getTitle() + "'"));
                 newTags.add(newTag);
             } catch (Exception e) {
                 logger.info("Something went wrong with tag '" + tag.getTitle() + "' creation");
+                logger.info(e.toString());
             }
         }
         contact.setTags(newTags);
@@ -104,7 +105,11 @@ public class ContactController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         logger.info("Deletion requested for contact record #" + id);
-        if (!repository.existsById(id)) { throw new ContactNotFoundException(id); }
+        Contact contact = repository.findById(id).orElseThrow(() -> new ContactNotFoundException(id));
+        if (contact.getTags().size() > 0) {
+            contact.setTags(new HashSet<Tag>());
+            repository.save(contact);
+        }
         try {
             repository.deleteById(id);
         } catch (IllegalArgumentException e) {

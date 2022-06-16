@@ -3,6 +3,7 @@ package com.example.demo.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,6 +16,7 @@ import javax.persistence.Version;
 import javax.persistence.JoinColumn;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Entity
 public class Contact {
@@ -34,6 +36,7 @@ public class Contact {
     private String lastName;
 
     @NotBlank(message = "Email is mandatory")
+    @Pattern(regexp = "^[^@]+@.+\\.[a-zA-Z]{2,}$", message = "A valid email is required")
     private String email;
 
     @NotBlank(message = "Phone number is mandatory")
@@ -44,7 +47,7 @@ public class Contact {
     @NotNull(message = "Description may not be null")
     private String description;
 
-    @ManyToMany()
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
         name = "Contact_Tag", 
         joinColumns = { @JoinColumn(name = "contact_id") }, 
