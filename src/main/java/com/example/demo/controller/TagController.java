@@ -61,7 +61,7 @@ public class TagController {
             return repository.findByTitle(tag.getTitle());
         } else {
             Tag newTag = repository.save(tag);
-            logger.info("Created tag record #" + newTag.getId());
+            logger.info("Trying to create tag record #" + newTag.getId());
             logger.info(newTag.toString());
             return newTag;
         }
